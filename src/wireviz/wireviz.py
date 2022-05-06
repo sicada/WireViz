@@ -232,7 +232,7 @@ def parse_cmdline():
     parser.add_argument('input_file', action='store', type=str, metavar='YAML_FILE')
     parser.add_argument('-o', '--output_file', action='store', type=str, metavar='OUTPUT')
     # Not implemented: parser.add_argument('--generate-bom', action='store_true', default=True)
-    parser.add_argument('--prepend-file', action='store', type=str, metavar='YAML_FILE')
+    parser.add_argument('--prepend-file', action='store', nargs="*", metavar='YAML_FILE', default=[])
     return parser.parse_args()
 
 
@@ -247,11 +247,11 @@ def main():
     with open_file_read(args.input_file) as fh:
         yaml_input = fh.read()
 
-    if args.prepend_file:
-        if not os.path.exists(args.prepend_file):
-            print(f'Error: prepend input file {args.prepend_file} inaccessible or does not exist, check path')
+    for pre_file in args.prepend_file:
+        if not os.path.exists(pre_file):
+            print(f'Error: prepend input file {pre_file} inaccessible or does not exist, check path')
             sys.exit(1)
-        with open_file_read(args.prepend_file) as fh:
+        with open_file_read(pre_file) as fh:
             prepend = fh.read()
             yaml_input = prepend + yaml_input
 
