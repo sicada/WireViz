@@ -7,7 +7,9 @@ from wireviz.DataClasses import Color
 from wireviz.wv_colors import translate_color
 from wireviz.wv_helper import remove_links
 
-def nested_html_table(rows: List[Union[str, List[Optional[str]], None]], table_attrs: str = '') -> str:
+def nested_html_table(rows: List[Union[str, List[Optional[str]], None]], 
+                      table_attrs: str = '',
+                      font_attrs: str = '') -> str:
     # input: list, each item may be scalar or list
     # output: a parent table with one child table per parent item that is list, and one cell per parent item that is scalar
     # purpose: create the appearance of one table, where cell widths are independent between rows
@@ -35,6 +37,10 @@ def nested_html_table(rows: List[Union[str, List[Optional[str]], None]], table_a
 def html_bgcolor_attr(color: Color) -> str:
     """Return attributes for bgcolor or '' if no color."""
     return f' bgcolor="{translate_color(color, "HEX")}"' if color else ''
+
+def html_fgcolor_attr(color: Color) -> str:
+    """Return attributes for font color or '' if no color."""
+    return f' color="{translate_color(color, "HEX")}"' if color else ''
 
 def html_bgcolor(color: Color, _extra_attr: str = '') -> str:
     """Return <td> attributes prefix for bgcolor or '' if no color."""

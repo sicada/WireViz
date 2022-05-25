@@ -134,6 +134,7 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
         # populate connection list
         connection_list = []
         for i, item in enumerate(connection):
+            # print(yaml_data['connectors'].keys())
             if isinstance(item, str):  # one single-pin component was specified
                 sublist = []
                 for i in range(1, itemcount + 1):

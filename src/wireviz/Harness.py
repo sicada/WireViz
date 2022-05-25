@@ -13,6 +13,7 @@ from wireviz.DataClasses import Metadata, Options, Tweak, Connector, Cable
 from wireviz.wv_colors import get_color_hex, translate_color
 from wireviz.wv_gv_html import nested_html_table, \
     html_bgcolor_attr, html_bgcolor, html_colorbar, \
+    html_fgcolor_attr, \
     html_image, html_caption, remove_links, html_line_breaks
 from wireviz.wv_bom import pn_info_string, component_table_entry, \
     get_additional_component_table, bom_list, generate_bom, \
@@ -125,22 +126,29 @@ class Harness:
 
             html = []
 
-            rows = [[f'{html_bgcolor(connector.bgcolor_title)}{remove_links(connector.name)}'
+            rows = [[f'{html_bgcolor(connector.bgcolor_title)}<b>{remove_links(connector.name)}</b>'
                         if connector.show_name else None],
+
                     [pn_info_string(HEADER_PN, None, remove_links(connector.pn)),
                      html_line_breaks(pn_info_string(HEADER_MPN, connector.manufacturer, connector.mpn)),
                      html_line_breaks(pn_info_string(HEADER_SPN, connector.supplier, connector.spn))],
-                    [html_line_breaks(connector.type),
+
+                    [f'{html_line_breaks(connector.type)}',
                      html_line_breaks(connector.subtype),
                      f'{connector.pincount}-pin' if connector.show_pincount else None,
                      translate_color(connector.color, self.options.color_mode) if connector.color else None,
                      html_colorbar(connector.color)],
+
                     '<!-- connector table -->' if connector.style != 'simple' else None,
                     [html_image(connector.image)],
                     [html_caption(connector.image)]]
             rows.extend(get_additional_component_table(self, connector))
             rows.append([html_line_breaks(connector.notes)])
-            html.extend(nested_html_table(rows, html_bgcolor_attr(connector.bgcolor)))
+            html.extend(nested_html_table(
+                rows, 
+                html_bgcolor_attr(connector.bgcolor),
+                html_fgcolor_attr(connector.fgcolor)
+            ))
 
             if connector.style != 'simple':
                 pinhtml = []
@@ -175,6 +183,7 @@ class Harness:
 
             html = '\n'.join(html)
             dot.node(connector.name, label=f'<\n{html}\n>', shape='box', style='filled',
+                     fontcolor=translate_color(self.options.fgcolor_connector, "HEX"),
                      fillcolor=translate_color(self.options.bgcolor_connector, "HEX"))
 
             if len(connector.loops) > 0:
@@ -210,7 +219,7 @@ class Harness:
                 elif cable.gauge_unit.upper() == 'AWG':
                     awg_fmt = f' ({mm2_equiv(cable.gauge)} mm\u00B2)'
 
-            rows = [[f'{html_bgcolor(cable.bgcolor_title)}{remove_links(cable.name)}'
+            rows = [[f'{html_bgcolor(cable.bgcolor_title)}<b>{remove_links(cable.name)}</b>'
                         if cable.show_name else None],
                     [pn_info_string(HEADER_PN, None,
                         remove_links(cable.pn)) if not isinstance(cable.pn, list) else None,
@@ -326,9 +335,13 @@ class Harness:
                     code_left_2 = f'{cable.name}:w{connection.via_port}:w'
                     dot.edge(code_left_1, code_left_2)
                     if from_connector.show_name:
-                        from_info = [str(connection.from_name), str(self.connectors[connection.from_name].pins[connection.from_port])]
+                        from_info = [
+                            #str(connection.from_name),
+                            #str(self.connectors[connection.from_name].pins[connection.from_port])
+                        ]
                         if from_connector.pinlabels:
                             pinlabel = from_connector.pinlabels[connection.from_port]
+                            pinlabel = " " + pinlabel + " "
                             if pinlabel != '':
                                 from_info.append(pinlabel)
                         from_string = ':'.join(from_info)
@@ -342,9 +355,13 @@ class Harness:
                     code_right_2 = f'{connection.to_name}{to_port}:w'
                     dot.edge(code_right_1, code_right_2)
                     if to_connector.show_name:
-                        to_info = [str(connection.to_name), str(self.connectors[connection.to_name].pins[connection.to_port])]
+                        to_info = [
+                            # str(connection.to_name),
+                            # str(self.connectors[connection.to_name].pins[connection.to_port])
+                        ]
                         if to_connector.pinlabels:
                             pinlabel = to_connector.pinlabels[connection.to_port]
+                            pinlabel = " " + pinlabel + " "
                             if pinlabel != '':
                                 to_info.append(pinlabel)
                         to_string = ':'.join(to_info)

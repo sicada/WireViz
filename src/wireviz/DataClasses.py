@@ -35,9 +35,11 @@ class Metadata(dict):
 @dataclass
 class Options:
     fontname: PlainText = 'arial'
+    fgcolor: Color = 'BK'
     bgcolor: Color = 'WH'
     bgcolor_node: Optional[Color] = 'WH'
     bgcolor_connector: Optional[Color] = None
+    fgcolor_connector: Optional[Color] = None
     bgcolor_cable: Optional[Color] = None
     bgcolor_bundle: Optional[Color] = None
     color_mode: ColorMode = 'SHORT'
@@ -46,6 +48,8 @@ class Options:
     def __post_init__(self):
         if not self.bgcolor_node:
             self.bgcolor_node = self.bgcolor
+        if not self.fgcolor_connector:
+            self.fgcolor_connector = self.fgcolor
         if not self.bgcolor_connector:
             self.bgcolor_connector = self.bgcolor_node
         if not self.bgcolor_cable:
@@ -120,7 +124,9 @@ class AdditionalComponent:
 class Connector:
     name: Designator
     bgcolor: Optional[Color] = None
+    fgcolor: Optional[Color] = None
     bgcolor_title: Optional[Color] = None
+    fgcolor_title: Optional[Color] = None
     manufacturer: Optional[MultilineHypertext] = None
     mpn: Optional[MultilineHypertext] = None
     supplier: Optional[MultilineHypertext] = None
